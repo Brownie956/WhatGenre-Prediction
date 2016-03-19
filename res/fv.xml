@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE feature_vector_file [
+   <!ELEMENT feature_vector_file (comments, data_set+)>
+   <!ELEMENT comments (#PCDATA)>
+   <!ELEMENT data_set (data_set_id, section*, feature*)>
+   <!ELEMENT data_set_id (#PCDATA)>
+   <!ELEMENT section (feature+)>
+   <!ATTLIST section start CDATA ""
+                     stop CDATA "">
+   <!ELEMENT feature (name, v+)>
+   <!ELEMENT name (#PCDATA)>
+   <!ELEMENT v (#PCDATA)>
+]>
+
+<feature_vector_file>
+
+   <comments></comments>
+
+	<data_set>
+		<data_set_id>res/trainingmusic/ZZTop-LaGrange.wav</data_set_id>
+		<feature>
+			<name>MFCC: MFCC</name>
+			<v>2.938E2</v>
+			<v>-1.408E0</v>
+			<v>-8.055E-2</v>
+			<v>-2.437E0</v>
+			<v>2.447E2</v>
+			<v>-3.887E0</v>
+			<v>-2.227E-1</v>
+			<v>-1.695E0</v>
+			<v>2.37E2</v>
+			<v>-3.199E0</v>
+			<v>3.857E-1</v>
+			<v>-1.435E0</v>
+			<v>2.324E2</v>
+			<v>-4.645E0</v>
+			<v>-2.108E-1</v>
+			<v>-1.564E0</v>
+			<v>2.301E2</v>
+			<v>-4.088E0</v>
+			<v>3.074E-1</v>
+			<v>-1.513E0</v>
+			<v>2.298E2</v>
+			<v>-4.067E0</v>
+			<v>1.274E-1</v>
+			<v>-1.168E0</v>
+			<v>2.274E2</v>
+			<v>-4.298E0</v>
+			<v>5.454E-1</v>
+			<v>-1.115E0</v>
+			<v>2.265E2</v>
+			<v>-4.053E0</v>
+			<v>4.195E-1</v>
+			<v>-1.073E0</v>
+			<v>2.27E2</v>
+			<v>-3.913E0</v>
+			<v>8.885E-1</v>
+			<v>-7.15E-1</v>
+			<v>2.273E2</v>
+			<v>-3.295E0</v>
+			<v>6.766E-1</v>
+			<v>-1.001E0</v>
+			<v>2.242E2</v>
+			<v>-4.542E0</v>
+			<v>4.879E-1</v>
+			<v>-7.638E-1</v>
+			<v>2.24E2</v>
+			<v>-4.528E0</v>
+			<v>-5.555E-2</v>
+			<v>-1.022E0</v>
+			<v>2.23E2</v>
+			<v>-4.027E0</v>
+			<v>6.717E-1</v>
+			<v>-8.482E-1</v>
+		</feature>
+	</data_set>
+
+</feature_vector_file>

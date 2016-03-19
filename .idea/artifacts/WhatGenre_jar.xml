@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="WhatGenre:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/WhatGenre_jar</output-path>
+    <root id="archive" name="WhatGenre.jar">
+      <element id="module-output" name="WhatGenre" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/SLF4J/slf4j-1.7.13/slf4j-api-1.7.13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/Neuroph/neuroph-2.92/neuroph-core-2.92.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/SLF4J/slf4j-1.7.13/slf4j-simple-1.7.13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Data/Documents/Uni-Stuff/CSC3095-Project/jAudioGIT-master/dist/jAudio.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
