@@ -58,7 +58,7 @@ public class Analysis {
             e.printStackTrace();
         }
 
-        /*Training.createTrainingSet();*/
+/*        Training.createTrainingSet();*/
 /*        DataSet trainingSet = DataSet.createFromFile(Conf.RESOURCESPATH + "trainingdatamfcc.csv",39,4,",");
         ClassifierMLP nnet = new ClassifierMLP();
         nnet.train(trainingSet);*/
