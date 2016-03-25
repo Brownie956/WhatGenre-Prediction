@@ -42,7 +42,7 @@ public class Training {
         HashMap<File, Genre> recordings = getRecordings();
 
         try{
-            File trainingData = new File(Conf.RESOURCESPATH, "trainingdatamfcc.csv");
+            File trainingData = new File(Conf.RESOURCESPATH, "trainingdatamfcc2.csv");
             PrintWriter writer = new PrintWriter(trainingData);
 
             int trainIndex = 0;

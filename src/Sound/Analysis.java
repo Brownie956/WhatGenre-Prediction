@@ -59,7 +59,7 @@ public class Analysis {
         }
 
 /*        Training.createTrainingSet();*/
-/*        DataSet trainingSet = DataSet.createFromFile(Conf.RESOURCESPATH + "trainingdatamfcc.csv",39,4,",");
+/*        DataSet trainingSet = DataSet.createFromFile(Conf.RESOURCESPATH + "trainingdatamfcc2.csv",39,4,",");
         ClassifierMLP nnet = new ClassifierMLP();
         nnet.train(trainingSet);*/
     }

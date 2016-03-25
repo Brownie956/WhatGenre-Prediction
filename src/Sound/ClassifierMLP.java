@@ -22,7 +22,7 @@ public class ClassifierMLP {
     private int numOfOutputs = 4;
 
     public ClassifierMLP(){
-        this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,numOfInputs,20,10,numOfOutputs);
+        this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,numOfInputs,15,numOfOutputs);
     }
 
     public ClassifierMLP(MultiLayerPerceptron nnet){
@@ -46,7 +46,7 @@ public class ClassifierMLP {
         mlp.getLearningRule().addListener(new LearningListener());
         mlp.getLearningRule().setLearningRate(0.01);
         mlp.getLearningRule().setMaxIterations(20000);
-        mlp.getLearningRule().setMaxError(0.0001);
+        mlp.getLearningRule().setMaxError(0.001);
         mlp.learn(trainingSet);
         mlp.save(Conf.RESOURCESPATH + "genremfccNet.nnet");
         System.out.println("Done training.");
