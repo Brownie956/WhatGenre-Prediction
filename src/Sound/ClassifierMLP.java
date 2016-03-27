@@ -88,9 +88,9 @@ public class ClassifierMLP {
 
             int i = 1;
             for(Map.Entry fold : trainTestCombos.entrySet()){
-                mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,15,Conf.NOOUTPUTS);
+                mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,16,Conf.NOOUTPUTS);
                 mlp.getLearningRule().addListener(new LearningListener());
-                mlp.getLearningRule().setLearningRate(0.1);
+                mlp.getLearningRule().setLearningRate(0.18);
                 mlp.getLearningRule().setMaxIterations(20000);
                 mlp.getLearningRule().setMaxError(0.001);
                 mlp.learn((DataSet) fold.getKey());

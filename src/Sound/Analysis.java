@@ -20,7 +20,7 @@ public class Analysis {
         * args[3] = feature value xml
         * args[4] = feature def xml
         * args[5] = NN*/
-/*        try {
+        try {
             Batch batch = new Batch(args[1], null);
             batch.setRecordings(new File[]{new File(args[0])});
             batch.getAggregator();
@@ -52,11 +52,11 @@ public class Analysis {
         }
         catch (Exception e){
             e.printStackTrace();
-        }*/
+        }
 
 /*        Training.createTrainingSet();*/
-        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+/*        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
         ClassifierMLP nnet = new ClassifierMLP();
-        nnet.train(trainingSet);
+        nnet.train(trainingSet);*/
     }
 }
