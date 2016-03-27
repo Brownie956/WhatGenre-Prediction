@@ -14,6 +14,41 @@
    <comments></comments>
 
 	<feature>
+		<name>MFCC: Spectral Rolloff Point</name>
+		<description>The fraction of bins in the power spectrum at which 85% of the power is at lower frequencies. This is a measure of the right-skewedness of the power spectrum.
+MFCC of each dimension of this feature</description>
+		<is_sequential>true</is_sequential>
+		<parallel_dimensions>4</parallel_dimensions>
+	</feature>
+	<feature>
+		<name>MFCC: Spectral Flux</name>
+		<description>A measure of the amount of spectral change in a signal. Found by calculating the change in the magnitude spectrum from frame to frame.
+MFCC of each dimension of this feature</description>
+		<is_sequential>true</is_sequential>
+		<parallel_dimensions>4</parallel_dimensions>
+	</feature>
+	<feature>
+		<name>MFCC: Zero Crossings</name>
+		<description>The number of times the waveform changed sign. An indication of frequency as well as noisiness.
+MFCC of each dimension of this feature</description>
+		<is_sequential>true</is_sequential>
+		<parallel_dimensions>4</parallel_dimensions>
+	</feature>
+	<feature>
+		<name>MFCC: Beat Sum</name>
+		<description>The sum of all entries in the beat histogram. This is a good measure of the importance of regular beats in a signal.
+MFCC of each dimension of this feature</description>
+		<is_sequential>true</is_sequential>
+		<parallel_dimensions>4</parallel_dimensions>
+	</feature>
+	<feature>
+		<name>MFCC: Strongest Frequency Via Zero Crossings</name>
+		<description>The strongest frequency component of a signal, in Hz, found via the number of zero-crossings.
+MFCC of each dimension of this feature</description>
+		<is_sequential>true</is_sequential>
+		<parallel_dimensions>4</parallel_dimensions>
+	</feature>
+	<feature>
 		<name>MFCC: MFCC</name>
 		<description>MFCC calculations based upon Orange Cow code
 MFCC of each dimension of this feature</description>

@@ -20,9 +20,9 @@
 
 <save_settings>
 	<windowSize>512</windowSize>
-	<windowOverlap>0.0</windowOverlap>
+	<windowOverlap>0.2</windowOverlap>
 	<samplingRate>16000.0</samplingRate>
-	<normalise>false</normalise>
+	<normalise>true</normalise>
 	<perWindowStats>false</perWindowStats>
 	<overallStats>true</overallStats>
 	<outputType>ACE</outputType>
@@ -68,7 +68,7 @@
 	</feature>
 	<feature>
 		<name>Spectral Rolloff Point</name>
-		<active>false</active>
+		<active>true</active>
 		<attribute>0.85</attribute>
 	</feature>
 	<feature>
@@ -112,7 +112,7 @@
 	</feature>
 	<feature>
 		<name>Spectral Flux</name>
-		<active>false</active>
+		<active>true</active>
 	</feature>
 	<feature>
 		<name>Derivative of Spectral Flux</name>
@@ -252,7 +252,7 @@
 	</feature>
 	<feature>
 		<name>Zero Crossings</name>
-		<active>false</active>
+		<active>true</active>
 	</feature>
 	<feature>
 		<name>Derivative of Zero Crossings</name>
@@ -316,7 +316,7 @@
 	</feature>
 	<feature>
 		<name>Beat Sum</name>
-		<active>false</active>
+		<active>true</active>
 	</feature>
 	<feature>
 		<name>Derivative of Beat Sum</name>
@@ -372,7 +372,7 @@
 	</feature>
 	<feature>
 		<name>Strongest Frequency Via Zero Crossings</name>
-		<active>false</active>
+		<active>true</active>
 	</feature>
 	<feature>
 		<name>Derivative of Strongest Frequency Via Zero Crossings</name>
@@ -456,7 +456,7 @@
 	</feature>
 	<feature>
 		<name>MFCC</name>
-		<active>false</active>
+		<active>true</active>
 		<attribute>13</attribute>
 	</feature>
 	<feature>
@@ -715,7 +715,7 @@
 	</feature>
 	<feature>
 		<name>ConstantQ</name>
-		<active>true</active>
+		<active>false</active>
 		<attribute>1.0</attribute>
 	</feature>
 	<feature>
@@ -814,8 +814,6 @@
 		<attribute>100</attribute>
 	</feature>
 			<aggregator>
-				<aggregatorName>Zernike Moments</aggregatorName>
-				<aggregatorFeature>ConstantQ</aggregatorFeature>
-				<aggregatorAttribute>10</aggregatorAttribute>
+				<aggregatorName>MFCC</aggregatorName>
 			</aggregator>
 </save_settings>

@@ -8,8 +8,6 @@ import jAudioFeatureExtractor.DataModel;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class Training {
 
@@ -21,7 +19,7 @@ public class Training {
 
     private static HashMap<File, Genre> getRecordings(){
         HashMap<File, Genre> recordings = new HashMap<File, Genre>();
-        final File folder = new File(Conf.TRAININGDATAPATH);
+        final File folder = new File(Conf.TRAININGDATADIRPATH);
         if(folder.isDirectory()){
             for(File track : folder.listFiles()) {
                 String fullName = track.getName();
@@ -42,47 +40,27 @@ public class Training {
         HashMap<File, Genre> recordings = getRecordings();
 
         try{
-            File trainingData = new File(Conf.RESOURCESPATH, "trainingdatamfcc2.csv");
+            File trainingData = new File(Conf.TRAININGDATAPATH);
             PrintWriter writer = new PrintWriter(trainingData);
 
             int trainIndex = 0;
             for(File rec : recordings.keySet()){
-                Batch batch = new Batch(Conf.featureFile, null);
+                System.out.println("Recording " + (trainIndex + 1) + " of " + recordings.size());
+
+                Batch batch = new Batch(Conf.FEATURESPATH, null);
                 batch.setRecordings(new File[]{rec});
-                batch.getAggregator();
-                batch.setSettings(Conf.settingsmfccFile);
+                batch.setSettings(Conf.SETTINGSPATH);
 
                 DataModel dm = batch.getDataModel();
-                OutputStream valsavepath = new FileOutputStream(Conf.FVOuputFile);
-                OutputStream defsavepath = new FileOutputStream(Conf.FKOuputFile);
-                dm.featureKey = defsavepath;
-                dm.featureValue = valsavepath;
+                OutputStream defSavePath = new FileOutputStream(Conf.FKOUTPUTPATH);
+                OutputStream valSavePath = new FileOutputStream(Conf.FVOUTPUTPATH);
+                dm.featureKey = defSavePath;
+                dm.featureValue = valSavePath;
                 batch.setDataModel(dm);
 
                 batch.execute();
 
                 double[][][] res = batch.getResults();
-                //TODO remove this
-                System.out.println("Recording " + (trainIndex + 1) + " of " + recordings.size());
-/*
-                for(int i = 0;  i < res.length; i++){
-                    for(int j = 0;  j < res[i].length; j++){
-                        for(int k = 0;  k < res[i][j].length; k++){
-                            System.out.println("Result: " + res[i][j][k]);
-                        }
-                    }
-                }
-*/
-
-/*                for(int i = 0;  i < res.length; i++){
-                    if(trainIndex != 0) writer.print("\r\n");
-                    for(int j = 0;  j < res[i].length; j++){
-                        if(j != 0) writer.print(",");
-                        for(int k = 0;  k < res[i][j].length; k++){
-                            writer.print(res[i][j][k]);
-                        }
-                    }
-                }*/
 
                 for(int i = 0;  i < res.length; i++){
                     for(int j = 0;  j < res[i].length; j++){

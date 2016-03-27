@@ -13,9 +13,6 @@ import java.util.ArrayList;
 
 public class Analysis {
 
-    private static String musicFile = Conf.RESOURCESPATH + "SheMovesInHerOwnWay.wav";
-    private static String musicFile2 = Conf.RESOURCESPATH + "BobMarley-OneLove.wav";
-
     public static void main(String[] args){
         /*args[0] = wav file
         * args[1] = features xml
@@ -23,7 +20,7 @@ public class Analysis {
         * args[3] = feature value xml
         * args[4] = feature def xml
         * args[5] = NN*/
-        try {
+/*        try {
             Batch batch = new Batch(args[1], null);
             batch.setRecordings(new File[]{new File(args[0])});
             batch.getAggregator();
@@ -48,7 +45,6 @@ public class Analysis {
                 }
             }
 
-            //String nn = Conf.RESOURCESPATH + "genreNet.nnet";
             String nn = args[5];
             DataSetRow testRow = new DataSetRow(vals);
             ClassifierMLP nnet = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(nn));
@@ -56,11 +52,11 @@ public class Analysis {
         }
         catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
 /*        Training.createTrainingSet();*/
-/*        DataSet trainingSet = DataSet.createFromFile(Conf.RESOURCESPATH + "trainingdatamfcc2.csv",39,4,",");
+        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
         ClassifierMLP nnet = new ClassifierMLP();
-        nnet.train(trainingSet);*/
+        nnet.train(trainingSet);
     }
 }
