@@ -9,17 +9,17 @@ import jAudioFeatureExtractor.DataModel;
 import java.io.*;
 import java.util.HashMap;
 
-public class Training {
+public class DataSetCreator {
 
-    public Training(){}
+    public DataSetCreator(){}
 
     private enum Genre {
         ROCK, DANCE, CLASSICAL, REGGAE
     }
 
-    private static HashMap<File, Genre> getRecordings(){
+    private static HashMap<File, Genre> getRecordings(String recordingsDir){
         HashMap<File, Genre> recordings = new HashMap<File, Genre>();
-        final File folder = new File(Conf.TRAININGDATADIRPATH);
+        final File folder = new File(recordingsDir);
         if(folder.isDirectory()){
             for(File track : folder.listFiles()) {
                 String fullName = track.getName();
@@ -36,11 +36,11 @@ public class Training {
         return recordings;
     }
 
-    public static void createTrainingSet(){
-        HashMap<File, Genre> recordings = getRecordings();
+    public static void createDataSet(String recordingsDir, String outputPath){
+        HashMap<File, Genre> recordings = getRecordings(recordingsDir);
 
         try{
-            File trainingData = new File(Conf.TRAININGDATAPATH);
+            File trainingData = new File(outputPath);
             PrintWriter writer = new PrintWriter(trainingData);
 
             int trainIndex = 0;

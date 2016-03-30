@@ -87,15 +87,15 @@ public class ClassifierMLP {
             double[] foldErrors = new double[trainTestCombos.size()];
 
             int i = 1;
-            for(Map.Entry fold : trainTestCombos.entrySet()){
+            for(Map.Entry combo : trainTestCombos.entrySet()){
                 mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,16,Conf.NOOUTPUTS);
                 mlp.getLearningRule().addListener(new LearningListener());
                 mlp.getLearningRule().setLearningRate(0.18);
                 mlp.getLearningRule().setMaxIterations(20000);
                 mlp.getLearningRule().setMaxError(0.001);
-                mlp.learn((DataSet) fold.getKey());
+                mlp.learn((DataSet) combo.getKey());
 
-                double error = testNetwork((DataSet) fold.getValue());
+                double error = testNetwork((DataSet) combo.getValue());
                 foldErrors[i - 1] = error;
                 logWriter.println("Fold " + i + " error: " + error);
                 i++;
@@ -117,7 +117,7 @@ public class ClassifierMLP {
         System.out.println("Done training.");
     }
 
-    private double testNetwork(DataSet testSet){
+    public double testNetwork(DataSet testSet){
         int noOfRows = testSet.getRows().size();
         double[] errorVals = new double[noOfRows];
 
@@ -161,7 +161,7 @@ public class ClassifierMLP {
         return sum / errorVals.length;
     }
 
-    public String classifyInstance(DataSetRow instance){
+    public double[] classifyInstance(DataSetRow instance){
         mlp.setInput(instance.getInput());
         mlp.calculate();
         double[] output = mlp.getOutput();
@@ -178,7 +178,7 @@ public class ClassifierMLP {
             outputPercentages[i] = Utils.round(output[i] / totalOutput * 100, 2);
         }
 
-        return outputToString(outputPercentages);
+        return outputPercentages;
     }
 
     static class LearningListener implements LearningEventListener {
@@ -191,13 +191,13 @@ public class ClassifierMLP {
 
     }
 
-    private String outputToString(double[] outputs){
+    public String outputToString(double[] outputs){
         //Create string in the format: val1,val2,val3,...,valN
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < outputs.length; i++){
             sb.append(outputs[i]);
             if(i < outputs.length - 1){
-                sb.append(",");
+                sb.append(", ");
             }
         }
         return sb.toString();

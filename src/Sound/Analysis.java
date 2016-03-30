@@ -47,16 +47,38 @@ public class Analysis {
 
             String nn = args[5];
             DataSetRow testRow = new DataSetRow(vals);
-            ClassifierMLP nnet = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(nn));
-            System.out.print(nnet.classifyInstance(testRow));
+            ClassifierMLP nnetClassifier = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(nn));
+            System.out.print(nnetClassifier.outputToString(nnetClassifier.classifyInstance(testRow)));
         }
         catch (Exception e){
             e.printStackTrace();
         }
 
-/*        Training.createTrainingSet();*/
+/*        DataSetCreator.createDataSet(Conf.TRAININGDATADIRPATH, Conf.TRAININGDATAPATH);*/
 /*        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
         ClassifierMLP nnet = new ClassifierMLP();
         nnet.train(trainingSet);*/
+//        DataSetCreator.createDataSet(Conf.TESTROCKDATADIRPATH, Conf.TESTROCKDATAPATH);
+//        DataSetCreator.createDataSet(Conf.TESTDANCEDATADIRPATH, Conf.TESTDANCEDATAPATH);
+//        DataSetCreator.createDataSet(Conf.TESTCLASSICALDATADIRPATH, Conf.TESTCLASSICALDATAPATH);
+//        DataSetCreator.createDataSet(Conf.TESTREGGAEDATADIRPATH, Conf.TESTREGGAEDATAPATH);
+
+/*        DataSet rockTestSet = DataSet.createFromFile(Conf.TESTROCKDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+        DataSet danceTestSet = DataSet.createFromFile(Conf.TESTDANCEDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+        DataSet classicalTestSet = DataSet.createFromFile(Conf.TESTCLASSICALDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+        DataSet reggaeTestSet = DataSet.createFromFile(Conf.TESTREGGAEDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+        ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
+
+        double rockTestError = mlp.testNetwork(rockTestSet);
+        double danceTestError = mlp.testNetwork(danceTestSet);
+        double classicalTestError = mlp.testNetwork(classicalTestSet);
+        double reggaeTestError = mlp.testNetwork(reggaeTestSet);
+        double overallTestError = Utils.mean(rockTestError, danceTestError, classicalTestError, reggaeTestError);
+
+        System.out.println("Rock test error: " + rockTestError);
+        System.out.println("Dance test error: " + danceTestError);
+        System.out.println("Classical test error: " + classicalTestError);
+        System.out.println("Reggae test error: " + reggaeTestError);
+        System.out.println("Overall test error: " + overallTestError);*/
     }
 }

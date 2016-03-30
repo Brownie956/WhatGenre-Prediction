@@ -16,4 +16,13 @@ public abstract class Utils {
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
+
+    //TODO make better use of this function
+    public static double mean(double... vals){
+        double sum = 0;
+        for(double val : vals){
+            sum += val;
+        }
+        return sum / vals.length;
+    }
 }
