@@ -181,6 +181,40 @@ public class ClassifierMLP {
         return outputPercentages;
     }
 
+    public int attemptClassify(DataSet testSet){
+        //Returns number of correctly classified
+        int numCorrect = 0;
+
+        for(int i = 0; i < testSet.size(); i++){
+            double[] rowRes = classifyInstance(testSet.getRowAt(i));
+            double[] expected = testSet.getRowAt(i).getDesiredOutput();
+
+            //Find index of predicted and correct genre
+            int predictedGenreIndex = findIndexOfLargest(rowRes);
+            int correctGenreIndex = findIndexOfLargest(expected);
+
+            if(predictedGenreIndex == correctGenreIndex) numCorrect++;
+        }
+
+        return numCorrect;
+    }
+
+    private int findIndexOfLargest(double[] results){
+        int indexOfLargest = 0;
+        try{
+            for(int i = 0; i < results.length; i++){
+                if(results[i] > results[indexOfLargest]){
+                    indexOfLargest = i;
+                }
+            }
+        }
+        catch (IndexOutOfBoundsException e){
+            System.out.println("Empty results array");
+            return -1;
+        }
+        return indexOfLargest;
+    }
+
     static class LearningListener implements LearningEventListener {
 
         public void handleLearningEvent(LearningEvent event) {
