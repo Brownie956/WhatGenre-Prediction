@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Analysis {
 
@@ -20,7 +21,7 @@ public class Analysis {
         * args[3] = feature value xml
         * args[4] = feature def xml
         * args[5] = NN*/
-        try {
+/*        try {
             Batch batch = new Batch(args[1], null);
             batch.setRecordings(new File[]{new File(args[0])});
             batch.getAggregator();
@@ -52,7 +53,7 @@ public class Analysis {
         }
         catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
 /*        DataSetCreator.createDataSet(Conf.TRAININGDATADIRPATH, Conf.TRAININGDATAPATH);*/
 /*        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATAPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
@@ -92,5 +93,35 @@ public class Analysis {
 //        System.out.println("Classical test correct: " + classicalTestCorrect);
 //        System.out.println("Reggae test correct: " + reggaeTestCorrect);
 //        System.out.println("Overall correct: " + overallCorrect);
+
+//        DataSetCreator.createDataSetPerWindow(Conf.TRAININGDATADIRPATH);
+//        DataSet trainingSet = DataSet.createFromFile(Conf.TRAININGDATATEMPPATH,Conf.NOINPUTS,Conf.NOOUTPUTS,",");
+//        ClassifierMLP nnet = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
+//        nnet.train();
+
+//        File file = new File("res/testmusic/Avicii-HeyBrother.wav");
+//        nnet.classifyInstance(file);
+
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.TESTREGGAEDATADIRPATH);
+/*        File[] csvFiles = DataSetCreator.getFilesInDir(Conf.TRAININGDATAOUTPUTDIRPATH);
+        HashMap<File[], File[]> trainTestMap = DataSetCreator.getTrainTestCombos(csvFiles);
+        ClassifierMLP mlp = new ClassifierMLP();
+        mlp.train(trainTestMap);*/
+        ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
+        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.TESTROCKDATACSVDIRPATH);
+        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.TESTDANCEDATACSVDIRPATH);
+        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.TESTCLASSICALDATACSVDIRPATH);
+        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.TESTREGGAEDATACSVDIRPATH);
+        int rockClassified = mlp.testNetwork(rockFiles);
+        int danceClassified = mlp.testNetwork(danceFiles);
+        int classicalClassified = mlp.testNetwork(classicalFiles);
+        int reggaeClassified = mlp.testNetwork(reggaeFiles);
+        int totalClassified = rockClassified + danceClassified + classicalClassified + reggaeClassified;
+
+        System.out.println("Total test rock correct: " + rockClassified);
+        System.out.println("Total test dance correct: " + danceClassified);
+        System.out.println("Total test classical correct: " + classicalClassified);
+        System.out.println("Total test reggae correct: " + reggaeClassified);
+        System.out.println("Total correct: " + totalClassified);
     }
 }

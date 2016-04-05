@@ -19,17 +19,15 @@ import org.neuroph.util.data.sample.Sampling;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClassifierMLP {
 
     private MultiLayerPerceptron mlp;
+    private static int learningFold = 1;
 
     public ClassifierMLP(){
-        this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,15,Conf.NOOUTPUTS);
+        this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,Conf.NOOFHIDDENNEURONS,Conf.NOOUTPUTS);
     }
 
     public ClassifierMLP(MultiLayerPerceptron nnet){
@@ -46,6 +44,99 @@ public class ClassifierMLP {
         else{
             this.mlp = nnet;
         }
+    }
+
+    public void train(){
+        try{
+            File foldLog = new File(Conf.FOLDLOGPATH);
+            PrintWriter logWriter = new PrintWriter(foldLog);
+            double[] foldErrors = new double[Conf.NOOFFOLDS];
+            //Get error values of each fold
+            for(int i = 1; i <= Conf.NOOFFOLDS; i++){
+                String trainingDataPath = Conf.getTrainingDataFoldPath(i);
+                String testDataPath = Conf.getTestDataFoldPath(i);
+
+                double foldError = train(trainingDataPath, testDataPath);
+                foldErrors[i - 1] = foldError;
+                logWriter.println("Fold " + i + " error: " + foldError);
+                learningFold++;
+            }
+
+            //Get average error
+            double averageError = Utils.mean(foldErrors);
+            logWriter.println("Overall error: " + averageError);
+            logWriter.close();
+        }
+        catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+        mlp.save(Conf.NNOUTPUTPATH);
+        System.out.println("Done training.");
+    }
+
+    public void train(HashMap<File[], File[]> trainTestCombos){
+        try {
+            File foldLog = new File(Conf.FOLDLOGPATH);
+            PrintWriter logWriter = new PrintWriter(foldLog);
+
+            //For every combo
+            int totalCorrect = 0;
+            int totalTested = 0;
+            for (HashMap.Entry<File[], File[]> combo : trainTestCombos.entrySet()) {
+                DataSet trainingDataSet = new DataSet(Conf.NOINPUTS, Conf.NOOUTPUTS);
+                //Combine the training sets into one trainingDataSet
+                for (File track : combo.getKey()) {
+                    DataSet trackDataSet = DataSet.createFromFile(track.getAbsolutePath(), Conf.NOINPUTS, Conf.NOOUTPUTS, ",");
+                    for (DataSetRow row : trackDataSet.getRows()) {
+                        trainingDataSet.addRow(row);
+                    }
+                }
+
+                //Train network
+                mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, Conf.NOINPUTS, Conf.NOOFHIDDENNEURONS, Conf.NOOUTPUTS);
+                mlp.getLearningRule().addListener(new LearningListener());
+                mlp.getLearningRule().setLearningRate(0.14);
+                mlp.getLearningRule().setMaxIterations(100);
+                mlp.getLearningRule().setMaxError(0.004);
+                mlp.learn(trainingDataSet);
+
+                //Test network
+                int correctlyPredicted = testNetwork(combo.getValue());
+                totalCorrect += correctlyPredicted;
+                logWriter.print("Fold " + learningFold + " correctly predicted: " + correctlyPredicted);
+                logWriter.println(" / " + combo.getValue().length);
+                learningFold++;
+                totalTested += combo.getValue().length;
+            }
+            logWriter.println("Total correctly predicted: " + totalCorrect);
+            logWriter.close();
+
+            if(totalCorrect < 28){
+                //Try again
+                train(trainTestCombos);
+            }
+            else {
+                mlp.save(Conf.NNOUTPUTPATH);
+                System.out.println("Done training.");
+            }
+        }
+        catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
+    private double train(String trainingDataPath, String testDataPath){
+        DataSet trainingData = DataSet.createFromFile(trainingDataPath, Conf.NOINPUTS, Conf.NOOUTPUTS, ",");
+        DataSet testData = DataSet.createFromFile(testDataPath, Conf.NOINPUTS, Conf.NOOUTPUTS, ",");
+
+        mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,Conf.NOOFHIDDENNEURONS,Conf.NOOUTPUTS);
+        mlp.getLearningRule().addListener(new LearningListener());
+        mlp.getLearningRule().setLearningRate(0.1);
+        mlp.getLearningRule().setMaxIterations(250);
+        mlp.getLearningRule().setMaxError(0.01);
+        mlp.learn(trainingData);
+
+        return testNetwork(testData);
     }
 
     public void train(DataSet trainingSet){
@@ -88,12 +179,14 @@ public class ClassifierMLP {
 
             int i = 1;
             for(Map.Entry combo : trainTestCombos.entrySet()){
-                mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,16,Conf.NOOUTPUTS);
+                mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,Conf.NOOFHIDDENNEURONS,Conf.NOOUTPUTS);
                 mlp.getLearningRule().addListener(new LearningListener());
-                mlp.getLearningRule().setLearningRate(0.18);
-                mlp.getLearningRule().setMaxIterations(20000);
+                mlp.getLearningRule().setLearningRate(0.1);
+                mlp.getLearningRule().setMaxIterations(200);
                 mlp.getLearningRule().setMaxError(0.001);
                 mlp.learn((DataSet) combo.getKey());
+
+                learningFold++;
 
                 double error = testNetwork((DataSet) combo.getValue());
                 foldErrors[i - 1] = error;
@@ -161,6 +254,43 @@ public class ClassifierMLP {
         return sum / errorVals.length;
     }
 
+    public int testNetwork(File[] testFiles){
+        int noOfCorrectPredictions = 0;
+        for(File track : testFiles){
+            ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+            String fileName = track.getName();
+            String genreFromFileName = fileName.substring(fileName.lastIndexOf("-") + 1, fileName.indexOf("."));
+            Conf.Genre fileGenre = Conf.Genre.UNKNOWN;
+            try{
+                fileGenre = Conf.Genre.valueOf(genreFromFileName.toUpperCase());
+            }
+            catch(IllegalArgumentException e){
+                e.printStackTrace();
+            }
+
+
+            DataSet trackDataSet = DataSet.createFromFile(track.getAbsolutePath(), Conf.NOINPUTS, Conf.NOOUTPUTS, ",");
+            for(DataSetRow row : trackDataSet.getRows()){
+                double[] rowResult = classifyInstance(row);
+
+                //Print prediction
+                Conf.Genre prediction = makePrediction(rowResult);
+                predictions.add(prediction);
+//                System.out.println("Row prediction: " + prediction);
+            }
+
+            //Find the majority of predictions
+            Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+            if(audioTrackPrediction.equals(fileGenre)){
+                //Correct
+                noOfCorrectPredictions++;
+            }
+            System.out.println("Predicted Genre: " + audioTrackPrediction);
+            System.out.println("Actual Genre: " + fileGenre);
+        }
+        return noOfCorrectPredictions;
+    }
+
     public double[] classifyInstance(DataSetRow instance){
         mlp.setInput(instance.getInput());
         mlp.calculate();
@@ -179,6 +309,106 @@ public class ClassifierMLP {
         }
 
         return outputPercentages;
+    }
+
+    public Conf.Genre classifyInstance(File audioTrack){
+        ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+
+        //Extract the values
+        Object[] featVals = DataSetCreator.extract(new File[]{audioTrack});
+        ArrayList<ArrayList<ArrayList<Double>>> dataSet = DataSetCreator.processToArrayList(featVals, false);
+
+        //Should only be one track in the returned values
+        if(dataSet.size() > 1){
+            System.out.println("Error: More than 1 audio track data returned");
+            return Conf.Genre.UNKNOWN;
+        }
+
+        ArrayList<ArrayList<Double>> trackDataSet = dataSet.get(0);
+
+        //For every row in data set, get output
+        for(ArrayList<Double> row : trackDataSet){
+            DataSetRow dataSetRow = new DataSetRow(row);
+            double[] rowResult = classifyInstance(dataSetRow);
+
+            //Print prediction
+            Conf.Genre prediction = makePrediction(rowResult);
+            predictions.add(prediction);
+            System.out.println("Row prediction: " + prediction);
+        }
+
+        //Find the majority of predictions
+        Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+        System.out.println(audioTrackPrediction);
+        return audioTrackPrediction;
+    }
+
+    private Conf.Genre findGenreMajority(ArrayList<Conf.Genre> predictions){
+        int[] genreTotals = new int[Conf.Genre.values().length];
+        HashMap<Conf.Genre, Integer> genreCounts = new HashMap<Conf.Genre, Integer>(Conf.Genre.values().length);
+        genreCounts.put(Conf.Genre.ROCK, 0);
+        genreCounts.put(Conf.Genre.DANCE, 0);
+        genreCounts.put(Conf.Genre.CLASSICAL, 0);
+        genreCounts.put(Conf.Genre.REGGAE, 0);
+        genreCounts.put(Conf.Genre.UNKNOWN, 0);
+
+
+        //Tally up
+        for(Conf.Genre genre : predictions){
+            if(genre == Conf.Genre.ROCK){
+                genreCounts.put(Conf.Genre.ROCK, genreCounts.get(Conf.Genre.ROCK) + 1);
+            }
+            else if(genre == Conf.Genre.DANCE){
+                genreCounts.put(Conf.Genre.DANCE, genreCounts.get(Conf.Genre.DANCE) + 1);
+            }
+            else if(genre == Conf.Genre.CLASSICAL){
+                genreCounts.put(Conf.Genre.CLASSICAL, genreCounts.get(Conf.Genre.CLASSICAL) + 1);
+            }
+            else if(genre == Conf.Genre.REGGAE){
+                genreCounts.put(Conf.Genre.REGGAE, genreCounts.get(Conf.Genre.REGGAE) + 1);
+            }
+            else genreCounts.put(Conf.Genre.UNKNOWN, genreCounts.get(Conf.Genre.UNKNOWN) + 1);
+        }
+
+        //Is there a genre majority
+        Conf.Genre genrePrediction = Conf.Genre.UNKNOWN;
+        for(HashMap.Entry<Conf.Genre, Integer> entry : genreCounts.entrySet()){
+            if(entry.getValue().equals(genreCounts.get(genrePrediction))){
+                genrePrediction = Conf.Genre.UNKNOWN;
+            }
+            else if(entry.getValue() > genreCounts.get(genrePrediction)){
+                genrePrediction = entry.getKey();
+            }
+        }
+
+        return genrePrediction;
+    }
+
+    private Conf.Genre makePrediction(double[] results){
+        Conf.Genre predictedGenre = Conf.Genre.UNKNOWN;
+        for(int i = 0; i < results.length; i++){
+            if(results[i] > Conf.GENRETHRESHOLD){
+                //Predicted a genre
+                switch (i){
+                    case 0:
+                        predictedGenre = Conf.Genre.ROCK;
+                        break;
+                    case 1:
+                        predictedGenre = Conf.Genre.DANCE;
+                        break;
+                    case 2:
+                        predictedGenre = Conf.Genre.CLASSICAL;
+                        break;
+                    case 3:
+                        predictedGenre = Conf.Genre.REGGAE;
+                        break;
+                    default:
+                        predictedGenre = Conf.Genre.UNKNOWN;
+                }
+                break;
+            }
+        }
+        return predictedGenre;
     }
 
     public int attemptClassify(DataSet testSet){
@@ -219,7 +449,7 @@ public class ClassifierMLP {
 
         public void handleLearningEvent(LearningEvent event) {
             BackPropagation bp = (BackPropagation) event.getSource();
-            System.out.println("Current iteration: " + bp.getCurrentIteration());
+            System.out.println("Current iteration: " + bp.getCurrentIteration() + " Fold: " + learningFold);
             System.out.println("Error: " + bp.getTotalNetworkError());
         }
 

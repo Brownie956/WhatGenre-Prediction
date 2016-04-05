@@ -5,6 +5,7 @@ package Sound;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 
 public abstract class Utils {
 
@@ -24,5 +25,13 @@ public abstract class Utils {
             sum += val;
         }
         return sum / vals.length;
+    }
+
+    public static double[] convertToPrimative(ArrayList<Double> doubles){
+        double[] primativeArray = new double[doubles.size()];
+        for(int i = 0; i < doubles.size(); i++){
+            primativeArray[i] = doubles.get(i);
+        }
+        return primativeArray;
     }
 }
