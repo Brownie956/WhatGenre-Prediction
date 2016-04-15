@@ -112,6 +112,8 @@ public class Analysis {
         File[] danceFiles = DataSetCreator.getFilesInDir(Conf.TESTDANCEDATACSVDIRPATH);
         File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.TESTCLASSICALDATACSVDIRPATH);
         File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.TESTREGGAEDATACSVDIRPATH);
+//        File[] bohemian = DataSetCreator.getFilesInDir(Conf.RESOURCESPATH + "temp-dir/");
+//        int beheClassified = mlp.testNetwork(bohemian);
         int rockClassified = mlp.testNetwork(rockFiles);
         int danceClassified = mlp.testNetwork(danceFiles);
         int classicalClassified = mlp.testNetwork(classicalFiles);

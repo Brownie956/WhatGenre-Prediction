@@ -276,7 +276,7 @@ public class ClassifierMLP {
                 //Print prediction
                 Conf.Genre prediction = makePrediction(rowResult);
                 predictions.add(prediction);
-//                System.out.println("Row prediction: " + prediction);
+                System.out.println("Row prediction: " + prediction);
             }
 
             //Find the majority of predictions
