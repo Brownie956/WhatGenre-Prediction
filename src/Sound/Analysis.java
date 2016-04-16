@@ -6,11 +6,11 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class Analysis {
 
@@ -107,23 +107,96 @@ public class Analysis {
         HashMap<File[], File[]> trainTestMap = DataSetCreator.getTrainTestCombos(csvFiles);
         ClassifierMLP mlp = new ClassifierMLP();
         mlp.train(trainTestMap);*/
-        ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
-        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.TESTROCKDATACSVDIRPATH);
-        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.TESTDANCEDATACSVDIRPATH);
-        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.TESTCLASSICALDATACSVDIRPATH);
-        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.TESTREGGAEDATACSVDIRPATH);
+//        ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
+//        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.TESTROCKDATACSVDIRPATH);
+//        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.TESTDANCEDATACSVDIRPATH);
+//        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.TESTCLASSICALDATACSVDIRPATH);
+//        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.TESTREGGAEDATACSVDIRPATH);
 //        File[] bohemian = DataSetCreator.getFilesInDir(Conf.RESOURCESPATH + "temp-dir/");
 //        int beheClassified = mlp.testNetwork(bohemian);
-        int rockClassified = mlp.testNetwork(rockFiles);
-        int danceClassified = mlp.testNetwork(danceFiles);
-        int classicalClassified = mlp.testNetwork(classicalFiles);
-        int reggaeClassified = mlp.testNetwork(reggaeFiles);
-        int totalClassified = rockClassified + danceClassified + classicalClassified + reggaeClassified;
+//        int rockClassified = mlp.testNetwork(rockFiles);
+//        int danceClassified = mlp.testNetwork(danceFiles);
+//        int classicalClassified = mlp.testNetwork(classicalFiles);
+//        int reggaeClassified = mlp.testNetwork(reggaeFiles);
+//        int totalClassified = rockClassified + danceClassified + classicalClassified + reggaeClassified;
+//
+//        System.out.println("Total test rock correct: " + rockClassified);
+//        System.out.println("Total test dance correct: " + danceClassified);
+//        System.out.println("Total test classical correct: " + classicalClassified);
+//        System.out.println("Total test reggae correct: " + reggaeClassified);
+//        System.out.println("Total correct: " + totalClassified);
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTRWavDir(Conf.Genre.ROCK));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTRWavDir(Conf.Genre.DANCE));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTRWavDir(Conf.Genre.CLASSICAL));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTRWavDir(Conf.Genre.REGGAE));
 
-        System.out.println("Total test rock correct: " + rockClassified);
-        System.out.println("Total test dance correct: " + danceClassified);
-        System.out.println("Total test classical correct: " + classicalClassified);
-        System.out.println("Total test reggae correct: " + reggaeClassified);
-        System.out.println("Total correct: " + totalClassified);
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTEWavDir(Conf.Genre.ROCK));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTEWavDir(Conf.Genre.DANCE));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTEWavDir(Conf.Genre.CLASSICAL));
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.getTEWavDir(Conf.Genre.REGGAE));
+
+/*        ArrayList<String> rockFileNames = DataSetCreator.getFileNamesInDir(Conf.getTROCsvDir(Conf.Genre.ROCK), true);
+        ArrayList<String> danceFileNames = DataSetCreator.getFileNamesInDir(Conf.getTROCsvDir(Conf.Genre.DANCE), true);
+        ArrayList<String> classicalFileNames = DataSetCreator.getFileNamesInDir(Conf.getTROCsvDir(Conf.Genre.CLASSICAL), true);
+        ArrayList<String> reggaeFileNames = DataSetCreator.getFileNamesInDir(Conf.getTROCsvDir(Conf.Genre.REGGAE), true);
+        ArrayList<String> allFileNames = new ArrayList<String>();
+        allFileNames.addAll(rockFileNames);
+        allFileNames.addAll(danceFileNames);
+        allFileNames.addAll(classicalFileNames);
+        allFileNames.addAll(reggaeFileNames);
+
+        Collections.shuffle(allFileNames);
+
+        HashMap<ArrayList<String>, ArrayList<String>> trainTestCombos = DataSetCreator.getTrainTestCombos(allFileNames);
+        ClassifierMLP mlp = new ClassifierMLP();
+        mlp.trainByStrings(trainTestCombos);*/
+
+/*        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.getTRCsvDir(Conf.Genre.ROCK));
+        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.getTRCsvDir(Conf.Genre.DANCE));
+        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.getTRCsvDir(Conf.Genre.CLASSICAL));
+        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.getTRCsvDir(Conf.Genre.REGGAE));
+        File[] allFiles = new File[rockFiles.length + danceFiles.length + classicalFiles.length + reggaeFiles.length];
+
+        int allFilesIndex = 0;
+        for(File file : rockFiles){
+            allFiles[allFilesIndex] = file;
+            allFilesIndex++;
+        }
+        for(File file : danceFiles){
+            allFiles[allFilesIndex] = file;
+            allFilesIndex++;
+        }
+        for(File file : classicalFiles){
+            allFiles[allFilesIndex] = file;
+            allFilesIndex++;
+        }
+        for(File file : reggaeFiles){
+            allFiles[allFilesIndex] = file;
+            allFilesIndex++;
+        }
+
+        List filesList = Arrays.asList(allFiles);
+        Collections.shuffle(filesList);
+        allFiles = (File[]) filesList.toArray(new File[filesList.size()]);
+
+        HashMap<File[], File[]> trainTest = DataSetCreator.getTrainTestCombos(allFiles);
+        ClassifierMLP mlp = new ClassifierMLP();
+        mlp.train(trainTest);*/
+
+        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.ROCK));
+        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.DANCE));
+        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.CLASSICAL));
+        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.REGGAE));
+
+        ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
+        int rockRes = mlp.testNetwork(rockFiles);
+        int danceRes = mlp.testNetwork(danceFiles);
+        int classicalRes = mlp.testNetwork(classicalFiles);
+        int reggaeRes = mlp.testNetwork(reggaeFiles);
+        System.out.println(rockRes);
+        System.out.println(danceRes);
+        System.out.println(classicalRes);
+        System.out.println(reggaeRes);
+        mlp.storecMatrix(Conf.CMATRIXPATH);
     }
 }

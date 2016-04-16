@@ -7,27 +7,32 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
-import org.neuroph.core.learning.LearningRule;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
-import org.neuroph.nnet.learning.DynamicBackPropagation;
-import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
-import org.neuroph.util.data.sample.Sampling;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 public class ClassifierMLP {
 
     private MultiLayerPerceptron mlp;
     private static int learningFold = 1;
+    private int[][] cMatrix;
+    private List<Conf.Genre> cMatrixClasses;
 
     public ClassifierMLP(){
         this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,Conf.NOOFHIDDENNEURONS,Conf.NOOUTPUTS);
+        this.cMatrix = new int[Conf.Genre.values().length][Conf.Genre.values().length];
+        this.cMatrixClasses = new ArrayList<Conf.Genre>();
+
+        this.cMatrixClasses.add(Conf.Genre.ROCK);
+        this.cMatrixClasses.add(Conf.Genre.DANCE);
+        this.cMatrixClasses.add(Conf.Genre.CLASSICAL);
+        this.cMatrixClasses.add(Conf.Genre.REGGAE);
+        this.cMatrixClasses.add(Conf.Genre.UNKNOWN);
+
+        this.cMatrixClasses = Collections.unmodifiableList(this.cMatrixClasses);
     }
 
     public ClassifierMLP(MultiLayerPerceptron nnet){
@@ -36,13 +41,74 @@ public class ClassifierMLP {
         if(numOfOutputs != Conf.NOOUTPUTS){
             System.out.println("NN has " + numOfOutputs + " outputs");
             System.out.println("Required number of outputs: " + Conf.NOOUTPUTS);
+            throw new IllegalArgumentException();
         }
         else if(numOfInputs != Conf.NOINPUTS){
             System.out.println("NN has " + numOfInputs + " inputs");
             System.out.println("Required number of inputs: " + Conf.NOINPUTS);
+            throw new IllegalArgumentException();
         }
         else{
             this.mlp = nnet;
+            this.cMatrix = new int[Conf.Genre.values().length][Conf.Genre.values().length];
+            this.cMatrixClasses = new ArrayList<Conf.Genre>();
+
+            this.cMatrixClasses.add(Conf.Genre.ROCK);
+            this.cMatrixClasses.add(Conf.Genre.DANCE);
+            this.cMatrixClasses.add(Conf.Genre.CLASSICAL);
+            this.cMatrixClasses.add(Conf.Genre.REGGAE);
+            this.cMatrixClasses.add(Conf.Genre.UNKNOWN);
+
+            this.cMatrixClasses = Collections.unmodifiableList(this.cMatrixClasses);
+        }
+    }
+
+    public int[][] getcMatrix(){
+        return cMatrix;
+    }
+
+    private void flushcMatrix(){
+        for(int i = 0; i < cMatrix.length; i++){
+            for(int j = 0; j < cMatrix[i].length; j++){
+                cMatrix[i][j] = 0;
+            }
+        }
+    }
+
+    public void storecMatrix(String outputPath){
+        try{
+            File matrixFile = new File(outputPath);
+            if(!matrixFile.exists()){
+                if(!matrixFile.createNewFile()){
+                    System.out.println("Can't create matrix file");
+                }
+            }
+
+            PrintWriter writer = new PrintWriter(matrixFile);
+            //Predicted classes
+            writer.print(",");
+            for(Conf.Genre genre : cMatrixClasses){
+                writer.print(genre);
+                if(cMatrixClasses.indexOf(genre) + 1 != cMatrixClasses.size()){
+                    writer.print(",");
+                }
+            }
+            writer.print("\r\n");
+
+            for(int i = 0; i < cMatrix.length; i++){
+                writer.print(cMatrixClasses.get(i) + ",");
+                for(int j = 0; j < cMatrix[i].length; j++){
+                    writer.print(cMatrix[i][j]);
+                    if(j + 1 != cMatrix[i].length){
+                        writer.print(",");
+                    }
+                }
+                writer.print("\r\n");
+            }
+            writer.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -72,6 +138,37 @@ public class ClassifierMLP {
         }
         mlp.save(Conf.NNOUTPUTPATH);
         System.out.println("Done training.");
+        flushcMatrix();
+    }
+
+    public void trainByStrings(HashMap<ArrayList<String>, ArrayList<String>> trainTestCombos){
+        HashMap<File[], File[]> trainTestFileCombos = new HashMap<File[], File[]>();
+        //For every fold
+        for(Map.Entry<ArrayList<String>, ArrayList<String>> foldCombo : trainTestCombos.entrySet()){
+            ArrayList<File> trainingFiles = new ArrayList<File>();
+            ArrayList<File> testFiles = new ArrayList<File>();
+            //Get the training files
+            for(String fileName : foldCombo.getKey()){
+                Conf.Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
+                File tempTrainFile = new File(Conf.getTROCsvDir(fileGenre) + fileName);
+                trainingFiles.add(tempTrainFile);
+            }
+
+            //Get the test files
+            for(String fileName : foldCombo.getValue()){
+                Conf.Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
+                File tempTestFile = new File(Conf.getTRCsvDir(fileGenre) + fileName);
+                testFiles.add(tempTestFile);
+            }
+
+            //Add the fold files to combo map
+            File[] trainingFileArray = trainingFiles.toArray(new File[trainingFiles.size()]);
+            File[] testFileArray = testFiles.toArray(new File[testFiles.size()]);
+            trainTestFileCombos.put(trainingFileArray, testFileArray);
+        }
+
+        //Train and test
+        train(trainTestFileCombos);
     }
 
     public void train(HashMap<File[], File[]> trainTestCombos){
@@ -95,9 +192,10 @@ public class ClassifierMLP {
                 //Train network
                 mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, Conf.NOINPUTS, Conf.NOOFHIDDENNEURONS, Conf.NOOUTPUTS);
                 mlp.getLearningRule().addListener(new LearningListener());
-                mlp.getLearningRule().setLearningRate(0.14);
-                mlp.getLearningRule().setMaxIterations(100);
-                mlp.getLearningRule().setMaxError(0.004);
+                mlp.getLearningRule().setLearningRate(0.12);
+                mlp.getLearningRule().setMaxIterations(500);
+                mlp.getLearningRule().setMaxError(0.0004);
+//                mlp.getLearningRule().setMaxError(0.01);
                 mlp.learn(trainingDataSet);
 
                 //Test network
@@ -111,14 +209,18 @@ public class ClassifierMLP {
             logWriter.println("Total correctly predicted: " + totalCorrect);
             logWriter.close();
 
-            if(totalCorrect < 28){
-                //Try again
-                train(trainTestCombos);
-            }
-            else {
-                mlp.save(Conf.NNOUTPUTPATH);
-                System.out.println("Done training.");
-            }
+//            if(totalCorrect < 28){
+//                //TODO remove me - Try again
+//                train(trainTestCombos);
+//            }
+//            else {
+//                mlp.save(Conf.NNOUTPUTPATH);
+//                System.out.println("Done training.");
+//            }
+
+            mlp.save(Conf.NNOUTPUTPATH);
+            System.out.println("Done training.");
+            flushcMatrix();
         }
         catch(FileNotFoundException e){
             e.printStackTrace();
@@ -208,6 +310,7 @@ public class ClassifierMLP {
         }
         mlp.save(Conf.NNOUTPUTPATH);
         System.out.println("Done training.");
+        flushcMatrix();
     }
 
     public double testNetwork(DataSet testSet){
@@ -287,6 +390,7 @@ public class ClassifierMLP {
             }
             System.out.println("Predicted Genre: " + audioTrackPrediction);
             System.out.println("Actual Genre: " + fileGenre);
+            cMatrix[cMatrixClasses.indexOf(fileGenre)][cMatrixClasses.indexOf(audioTrackPrediction)]++;
         }
         return noOfCorrectPredictions;
     }
@@ -344,7 +448,6 @@ public class ClassifierMLP {
     }
 
     private Conf.Genre findGenreMajority(ArrayList<Conf.Genre> predictions){
-        int[] genreTotals = new int[Conf.Genre.values().length];
         HashMap<Conf.Genre, Integer> genreCounts = new HashMap<Conf.Genre, Integer>(Conf.Genre.values().length);
         genreCounts.put(Conf.Genre.ROCK, 0);
         genreCounts.put(Conf.Genre.DANCE, 0);
@@ -371,14 +474,25 @@ public class ClassifierMLP {
         }
 
         //Is there a genre majority
-        Conf.Genre genrePrediction = Conf.Genre.UNKNOWN;
+        Conf.Genre genrePrediction;
+        Integer largestVal = null;
+        ArrayList<Conf.Genre> largestValues = new ArrayList<Conf.Genre>();
         for(HashMap.Entry<Conf.Genre, Integer> entry : genreCounts.entrySet()){
-            if(entry.getValue().equals(genreCounts.get(genrePrediction))){
-                genrePrediction = Conf.Genre.UNKNOWN;
+            if(largestVal == null || largestVal < entry.getValue()){
+                largestVal = entry.getValue();
+                largestValues.clear();
+                largestValues.add(entry.getKey());
             }
-            else if(entry.getValue() > genreCounts.get(genrePrediction)){
-                genrePrediction = entry.getKey();
+            else if(largestVal.equals(entry.getValue())){
+                largestValues.add(entry.getKey());
             }
+        }
+        //Check if there are multiple largest values
+        if(largestValues.size() > 1){
+            genrePrediction = Conf.Genre.UNKNOWN;
+        }
+        else {
+            genrePrediction = largestValues.get(0);
         }
 
         return genrePrediction;

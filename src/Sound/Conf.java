@@ -6,6 +6,7 @@ package Sound;
 public class Conf {
 
     private static Conf sessionInstance = new Conf();
+    private GenrePredictor genrePredictor;
 
     public enum Genre {
         ROCK, DANCE, CLASSICAL, REGGAE, UNKNOWN
@@ -16,6 +17,44 @@ public class Conf {
     public static final String RESOURCESPATH = "res/";
     public static final String TRAININGDATADIRPATH = RESOURCESPATH + "trainingmusic-cut/";
     public static final String TRAININGTEMPDIRPATH = RESOURCESPATH + "temp-trainingMusic/";
+
+    /*TRAINING MUSIC FILE DIRECTORIES*/
+    public static final String TR_MUSIC_BASE_DIR = RESOURCESPATH + "trainingMusic";
+    private static String getTRGenreDir(Genre genre){
+        return TR_MUSIC_BASE_DIR + "/" + genre.toString().toLowerCase() + "/";
+    }
+    public static String getTRWavDir(Genre genre){
+        return getTRGenreDir(genre) + "wav/";
+    }
+    public static String getTRCsvDir(Genre genre){
+        return getTRGenreDir(genre) + "csv/"; //TODO change me
+    }
+    public static String getTROCsvDir(Genre genre){
+        return getTRGenreDir(genre) + "csv-sh-overall/"; //TODO change me
+    }
+    public static String getTRTrackCsvPath(String trackName, Genre genre){
+        return getTRCsvDir(genre) + trackName + ".csv";
+    }
+    public static String getTROTrackCsvPath(String trackName, Genre genre){
+        return getTROCsvDir(genre) + trackName + ".csv";
+    }
+
+    /*TEST MUSIC FILE DIRECTORIES*/
+    public static final String TE_MUSIC_BASE_DIR = RESOURCESPATH + "testMusic";
+    private static String getTEGenreDir(Genre genre){
+        return TE_MUSIC_BASE_DIR + "/" + genre.toString().toLowerCase() + "/";
+    }
+    public static String getTEWavDir(Genre genre){
+        return getTEGenreDir(genre) + "wav/";
+    }
+    public static String getTECsvDir(Genre genre){
+        return getTEGenreDir(genre) + "csv/"; //TODO change me
+    }
+    public static String getTETrackCsvPath(String trackName, Genre genre){
+        return getTECsvDir(genre) + trackName + ".csv";
+    }
+
+
 //    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/50/";
 //    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/100/";
 //    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/150/";
@@ -73,25 +112,42 @@ public class Conf {
     public static final String FEATURESPATH = RESOURCESPATH + "features.xml";
     public static final String SETTINGSPATH = RESOURCESPATH + "settings.xml";
     public static final String SETTINGSWINPATH = RESOURCESPATH + "settings-win.xml";
+    public static final String SETTINGS_MFCC_WIN_PATH = RESOURCESPATH + "mfcc-settings.xml";
+    public static final String SETTINGS_MFCC_OV_PATH = RESOURCESPATH + "mfcc-overall-settings.xml";
+    public static final String SETTINGS_MFCC_SF_WIN_PATH = RESOURCESPATH + "mfcc-sf-settings.xml";
+    public static final String SETTINGS_MFCC_SF_OV_PATH = RESOURCESPATH + "mfcc-sf-overall-settings.xml";
+    public static final String SETTINGS_SLEDGEHAMMER_WIN_PATH = RESOURCESPATH + "sledgehammer-settings.xml";
+    public static final String SETTINGS_SLEDGEHAMMER_OV_PATH = RESOURCESPATH + "sledgehammer-overall-settings.xml";
     public static final String FKOUTPUTPATH = RESOURCESPATH + "fk.xml";
     public static final String FVOUTPUTPATH = RESOURCESPATH + "fv.xml";
 
 //    public static final String NNOUTPUTPATH = RESOURCESPATH + "genreNet.nnet";
-    public static final String NNOUTPUTPATH = RESOURCESPATH + "genreNet-temp.nnet";
+//    public static final String NNOUTPUTPATH = RESOURCESPATH + "genreNet-temp.nnet";
+//    public static final String NNOUTPUTPATH = RESOURCESPATH + "mfcc-genreNet.nnet";
+//    public static final String NNOUTPUTPATH = RESOURCESPATH + "mfcc-sf-genreNet.nnet";
+    public static final String NNOUTPUTPATH = RESOURCESPATH + "sledgehammer-genreNet.nnet";
+
+    public static final String CMATRIXPATH = RESOURCESPATH + "confusion-matrix.csv";
 
 //    public static final int NOINPUTS = 54;
-    public static final int NOINPUTS = 16;
+//    public static final int NOINPUTS = 16;
+    public static final int NOINPUTS = 30;
 //    public static final int NOOFHIDDENNEURONS = 16;
-    public static final int NOOFHIDDENNEURONS = 200;
+//    public static final int NOOFHIDDENNEURONS = 200;
+    public static final int NOOFHIDDENNEURONS = 40;
     public static final int NOOUTPUTS = 4;
     public static final int NOOFFOLDS = 10;
 
-    public static final int NOOFWINDOWSTOAVERAGE = 50;
+    public static final int NOOFWINDOWSTOAVERAGE = 300;
 
     public static Conf getConfig() {
         return sessionInstance;
     }
+    public GenrePredictor getGenrePredictor(){
+        return genrePredictor;
+    }
 
     private Conf() {
+        this.genrePredictor = new GenrePredictor();
     }
 }

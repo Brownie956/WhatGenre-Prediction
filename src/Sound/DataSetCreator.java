@@ -11,6 +11,7 @@ import jAudioFeatureExtractor.DataModel;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DataSetCreator {
 
@@ -45,6 +46,28 @@ public class DataSetCreator {
             System.out.println(directory);
             return new File[0];
         }
+    }
+
+    public static ArrayList<String> getFileNamesInDir(String directory, boolean includeExt){
+        ArrayList<String> fileNames = new ArrayList<String>();
+        final File folder = new File(directory);
+        if(folder.isDirectory()){
+            File[] files = folder.listFiles();
+            for(File file : files){
+                if(includeExt){
+                    fileNames.add(file.getName());
+                }
+                else {
+                    String fileName = file.getName();
+                    fileNames.add(fileName.substring(0,fileName.indexOf(".")));
+                }
+            }
+        }
+        else {
+            System.out.println("File path is not a directory");
+            System.out.println(directory);
+        }
+        return fileNames;
     }
 
     public static void createDataSetOverall(String recordingsDir, String outputPath){
@@ -135,23 +158,18 @@ public class DataSetCreator {
 
     public static void createTrainingMusicCSVFiles(String recordingsDir){
         HashMap<File, Conf.Genre> recordings = getRecordings(recordingsDir);
-        File[] files = new File[recordings.size()];
-        int fileIndex = 0;
-        for(File rec : recordings.keySet()){
-            files[fileIndex] = rec;
-            fileIndex++;
-        }
 
         int fileNumber = 1;
-        for(File file: recordings.keySet()){
+        for(Map.Entry recording : recordings.entrySet()){
             System.out.println("Extracting track number: " + fileNumber);
-            Object[] extractedValues = extract(new File[]{file});
+            Object[] extractedValues = extract(new File[]{(File) recording.getKey()});
             //For every extracted dataSet - Should be 1
             for(Object trackObj : extractedValues){
                 DataSet track = (DataSet) trackObj;
                 String id = track.identifier;
                 String audioTrackName = id.substring(id.lastIndexOf("/") + 1, id.indexOf("."));
-                processToFile(extractedValues, Conf.getTrackCSVPath(audioTrackName));
+//                processToFile(extractedValues, Conf.getTrackCSVPath(audioTrackName));
+                processOverallToFile(extractedValues, Conf.getTROTrackCsvPath(audioTrackName, (Conf.Genre) recording.getValue()));
             }
             fileNumber++;
         }
@@ -265,7 +283,9 @@ public class DataSetCreator {
         try {
             Batch batch = new Batch(Conf.FEATURESPATH, null);
             batch.setRecordings(audioTracks);
-            batch.setSettings(Conf.SETTINGSWINPATH);
+//            batch.setSettings(Conf.SETTINGSWINPATH);
+            //TODO change me
+            batch.setSettings(Conf.SETTINGS_MFCC_OV_PATH);
 
             DataModel dm = batch.getDataModel();
             OutputStream defSavePath = new FileOutputStream(Conf.FKOUTPUTPATH);
@@ -282,6 +302,52 @@ public class DataSetCreator {
             e.printStackTrace();
         }
         return res;
+    }
+
+    private static void processOverallToFile(Object[] results, String outputPath){
+        try{
+            File outputFile = new File(outputPath);
+            PrintWriter writer = new PrintWriter(outputFile);
+
+            //For every track...
+            for(int i = 0; i < results.length; i++){
+                ArrayList<Double> extractedValues = new ArrayList<Double>();
+
+                DataSet track = (DataSet) results[i];
+                String id = track.identifier;
+                String audioTrackName = id.substring(id.lastIndexOf("/") + 1, id.indexOf("."));
+
+                //Get genre values to append
+                String trackNameGenre = audioTrackName.substring(audioTrackName.lastIndexOf("-") + 1, audioTrackName.length());
+                String genreValues = getTrackExpectedOutput(trackNameGenre);
+
+                //Get all the values
+                for(int j = 0; j < track.feature_values.length; j++){
+                    for(int k = 0; k < track.feature_values[j].length; k++){
+                        if(k != 0){
+                            extractedValues.add(track.feature_values[j][k]);
+                        }
+                    }
+                }
+
+                //Convert to array and filter
+                double[] vals = Utils.convertToPrimative(extractedValues);
+                //TODO change me
+                //vals = filterDataRow(vals);
+
+                //Save values to file
+                for(double val : vals){
+                    writer.print(val + ",");
+                }
+                //Append genre
+                writer.print(genreValues);
+                writer.print("\r\n");
+            }
+            writer.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     private static void processToFile(Object[] results, String outputPath){
@@ -356,17 +422,25 @@ public class DataSetCreator {
 
         for(int j = 0; j < rowData.length; j++){
             double val = rowData[j];
-            //Scale down Zero Crossings
-            if(j == 2){
-                val = val / 100;
+            //Scale Spectral Centroid
+            if(j == 0){
+                val = val / 10;
             }
-            //Scale down Strongest Frequency values
+            //Scale Compactness
             else if(j == 3){
+                val = val / 1000;
+            }
+            //Scale Zero-Crossings
+            else if(j == 6){
+                val = val / 10;
+            }
+            //Scale Strongest Frequency via Zero-Crossings
+            else if(j == 7){
                 val = val / 1000;
             }
 
             //Add to list if value if not the first MFCC value
-            if(j != 4){
+            if(j != 8){
                 filteredValues.add(val);
             }
         }
@@ -460,6 +534,36 @@ public class DataSetCreator {
             Object[] trainingFilesArray = trainingFiles.toArray(new Object[trainingFiles.size()]);
             Object[] testFilesArray = testFiles.toArray(new Object[testFiles.size()]);
             trainTestCombos.put(trainingFilesArray, testFilesArray);
+        }
+        return trainTestCombos;
+    }
+
+    public static HashMap<ArrayList<String>, ArrayList<String>> getTrainTestCombos(ArrayList<String> files){
+        int noOfTestFiles = files.size() / Conf.NOOFFOLDS;
+
+        HashMap<ArrayList<String>, ArrayList<String>> trainTestCombos = new HashMap<ArrayList<String>, ArrayList<String>>();
+
+        //For every fold, get the training:test combos
+        for(int fold = 0; fold < Conf.NOOFFOLDS; fold++){
+            //Get the starting index of test rows
+            int startPoint = fold * noOfTestFiles;
+            ArrayList<String> trainingFiles = new ArrayList<String>();
+            ArrayList<String> testFiles = new ArrayList<String>();
+
+            //Extract the test files
+            for(int i = 0; i < files.size(); i++){
+                String tempFile = files.get(i);
+                if(i >= startPoint && i < startPoint + noOfTestFiles){
+                    //Test File
+                    testFiles.add(tempFile);
+                }
+                else {
+                    //Train Row
+                    trainingFiles.add(tempFile);
+                }
+            }
+            //Store combo
+            trainTestCombos.put(trainingFiles, testFiles);
         }
         return trainTestCombos;
     }
