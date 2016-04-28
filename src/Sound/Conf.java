@@ -139,6 +139,9 @@ public class Conf {
     public static final int NOOFFOLDS = 10;
 
     public static final int NOOFWINDOWSTOAVERAGE = 300;
+    //Assume 1 window length
+    private static final double SINGLEWINDOWTIME = 0.0093;
+    public static final double MULTIWINDOWTIME = NOOFWINDOWSTOAVERAGE * SINGLEWINDOWTIME;
 
     public static Conf getConfig() {
         return sessionInstance;

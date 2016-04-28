@@ -112,8 +112,7 @@ public class Analysis {
 //        File[] danceFiles = DataSetCreator.getFilesInDir(Conf.TESTDANCEDATACSVDIRPATH);
 //        File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.TESTCLASSICALDATACSVDIRPATH);
 //        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.TESTREGGAEDATACSVDIRPATH);
-//        File[] bohemian = DataSetCreator.getFilesInDir(Conf.RESOURCESPATH + "temp-dir/");
-//        int beheClassified = mlp.testNetwork(bohemian);
+
 //        int rockClassified = mlp.testNetwork(rockFiles);
 //        int danceClassified = mlp.testNetwork(danceFiles);
 //        int classicalClassified = mlp.testNetwork(classicalFiles);
@@ -183,13 +182,13 @@ public class Analysis {
         ClassifierMLP mlp = new ClassifierMLP();
         mlp.train(trainTest);*/
 
-        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.ROCK));
+/*        File[] rockFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.ROCK));
         File[] danceFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.DANCE));
         File[] classicalFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.CLASSICAL));
-        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.REGGAE));
+        File[] reggaeFiles = DataSetCreator.getFilesInDir(Conf.getTECsvDir(Conf.Genre.REGGAE));*/
 
         ClassifierMLP mlp = new ClassifierMLP((MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(Conf.NNOUTPUTPATH));
-        int rockRes = mlp.testNetwork(rockFiles);
+/*        int rockRes = mlp.testNetwork(rockFiles);
         int danceRes = mlp.testNetwork(danceFiles);
         int classicalRes = mlp.testNetwork(classicalFiles);
         int reggaeRes = mlp.testNetwork(reggaeFiles);
@@ -197,6 +196,10 @@ public class Analysis {
         System.out.println(danceRes);
         System.out.println(classicalRes);
         System.out.println(reggaeRes);
-        mlp.storecMatrix(Conf.CMATRIXPATH);
+        mlp.storecMatrix(Conf.CMATRIXPATH);*/
+
+        File[] bohemian = DataSetCreator.getFilesInDir(Conf.RESOURCESPATH + "temp-dir/csv");
+        int beheClassified = mlp.testNetwork(bohemian);
+//        DataSetCreator.createTrainingMusicCSVFiles(Conf.RESOURCESPATH + "temp-dir/wav");
     }
 }

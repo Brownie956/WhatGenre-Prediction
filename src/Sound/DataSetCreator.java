@@ -169,7 +169,8 @@ public class DataSetCreator {
                 String id = track.identifier;
                 String audioTrackName = id.substring(id.lastIndexOf("/") + 1, id.indexOf("."));
 //                processToFile(extractedValues, Conf.getTrackCSVPath(audioTrackName));
-                processOverallToFile(extractedValues, Conf.getTROTrackCsvPath(audioTrackName, (Conf.Genre) recording.getValue()));
+//                processOverallToFile(extractedValues, Conf.getTROTrackCsvPath(audioTrackName, (Conf.Genre) recording.getValue()));
+                processToFile(extractedValues, Conf.RESOURCESPATH + "temp-dir/csv/" + audioTrackName + ".csv");
             }
             fileNumber++;
         }
@@ -285,7 +286,7 @@ public class DataSetCreator {
             batch.setRecordings(audioTracks);
 //            batch.setSettings(Conf.SETTINGSWINPATH);
             //TODO change me
-            batch.setSettings(Conf.SETTINGS_MFCC_OV_PATH);
+            batch.setSettings(Conf.SETTINGS_SLEDGEHAMMER_WIN_PATH);
 
             DataModel dm = batch.getDataModel();
             OutputStream defSavePath = new FileOutputStream(Conf.FKOUTPUTPATH);
@@ -333,7 +334,7 @@ public class DataSetCreator {
                 //Convert to array and filter
                 double[] vals = Utils.convertToPrimative(extractedValues);
                 //TODO change me
-                //vals = filterDataRow(vals);
+                vals = filterDataRow(vals);
 
                 //Save values to file
                 for(double val : vals){

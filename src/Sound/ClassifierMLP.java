@@ -373,13 +373,15 @@ public class ClassifierMLP {
 
 
             DataSet trackDataSet = DataSet.createFromFile(track.getAbsolutePath(), Conf.NOINPUTS, Conf.NOOUTPUTS, ",");
+            double timeEstimate = Conf.MULTIWINDOWTIME;
             for(DataSetRow row : trackDataSet.getRows()){
                 double[] rowResult = classifyInstance(row);
 
                 //Print prediction
                 Conf.Genre prediction = makePrediction(rowResult);
                 predictions.add(prediction);
-                System.out.println("Row prediction: " + prediction);
+                System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
+                timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
             }
 
             //Find the majority of predictions

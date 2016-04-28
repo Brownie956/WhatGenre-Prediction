@@ -1,11 +1,11 @@
-Fold 161 correctly predicted: 3 / 4
-Fold 162 correctly predicted: 4 / 4
-Fold 163 correctly predicted: 3 / 4
-Fold 164 correctly predicted: 2 / 4
-Fold 165 correctly predicted: 2 / 4
-Fold 166 correctly predicted: 1 / 4
-Fold 167 correctly predicted: 3 / 4
-Fold 168 correctly predicted: 4 / 4
-Fold 169 correctly predicted: 3 / 4
-Fold 170 correctly predicted: 3 / 4
-Total correctly predicted: 28
+Fold 1 correctly predicted: 4 / 4
+Fold 2 correctly predicted: 3 / 4
+Fold 3 correctly predicted: 4 / 4
+Fold 4 correctly predicted: 3 / 4
+Fold 5 correctly predicted: 3 / 4
+Fold 6 correctly predicted: 4 / 4
+Fold 7 correctly predicted: 2 / 4
+Fold 8 correctly predicted: 2 / 4
+Fold 9 correctly predicted: 3 / 4
+Fold 10 correctly predicted: 4 / 4
+Total correctly predicted: 32
