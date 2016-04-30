@@ -3,6 +3,7 @@
 *.iml
 out
 
+/res/fk.xml
 /res/fv.xml
 
 # Created by .ignore support plugin (hsz.mobi)
