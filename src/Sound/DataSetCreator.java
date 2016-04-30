@@ -13,19 +13,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import Sound.GenrePredictor.Genre;
+
 public class DataSetCreator {
 
     public DataSetCreator(){}
 
-    private static HashMap<File, Conf.Genre> getRecordings(String recordingsDir){
-        HashMap<File, Conf.Genre> recordings = new HashMap<File, Conf.Genre>();
+    private static HashMap<File, Genre> getRecordings(String recordingsDir){
+        HashMap<File, Genre> recordings = new HashMap<File, Genre>();
         final File folder = new File(recordingsDir);
         if(folder.isDirectory()){
             for(File track : folder.listFiles()) {
                 String fullName = track.getName();
                 String fileGenre = fullName.substring(fullName.lastIndexOf("-") + 1, fullName.indexOf("."));
                 try{
-                    Conf.Genre genre = Conf.Genre.valueOf(fileGenre.toUpperCase());
+                    Genre genre = Genre.valueOf(fileGenre.toUpperCase());
                     recordings.put(track, genre);
                 }
                 catch (IllegalArgumentException e){
@@ -71,7 +73,7 @@ public class DataSetCreator {
     }
 
     public static void createDataSetOverall(String recordingsDir, String outputPath){
-        HashMap<File, Conf.Genre> recordings = getRecordings(recordingsDir);
+        HashMap<File, Genre> recordings = getRecordings(recordingsDir);
 
         try{
             File trainingData = new File(outputPath);
@@ -105,7 +107,7 @@ public class DataSetCreator {
                 }
 
                 //Append the genre
-                Conf.Genre trackGenre = recordings.get(rec);
+                Genre trackGenre = recordings.get(rec);
                 switch (trackGenre){
                     case ROCK:
                         writer.print("1,0,0,0");
@@ -131,7 +133,7 @@ public class DataSetCreator {
     }
 
     public static void createDataSetPerWindow(String recordingsDir){
-        HashMap<File, Conf.Genre> recordings = getRecordings(recordingsDir);
+        HashMap<File, Genre> recordings = getRecordings(recordingsDir);
         File[] files = new File[recordings.size()];
         int fileIndex = 0;
         for(File rec : recordings.keySet()){
@@ -157,7 +159,7 @@ public class DataSetCreator {
     }
 
     public static void createTrainingMusicCSVFiles(String recordingsDir){
-        HashMap<File, Conf.Genre> recordings = getRecordings(recordingsDir);
+        HashMap<File, Genre> recordings = getRecordings(recordingsDir);
 
         int fileNumber = 1;
         for(Map.Entry recording : recordings.entrySet()){
@@ -169,7 +171,7 @@ public class DataSetCreator {
                 String id = track.identifier;
                 String audioTrackName = id.substring(id.lastIndexOf("/") + 1, id.indexOf("."));
 //                processToFile(extractedValues, Conf.getTrackCSVPath(audioTrackName));
-//                processOverallToFile(extractedValues, Conf.getTROTrackCsvPath(audioTrackName, (Conf.Genre) recording.getValue()));
+//                processOverallToFile(extractedValues, Conf.getTROTrackCsvPath(audioTrackName, (Genre) recording.getValue()));
                 processToFile(extractedValues, Conf.RESOURCESPATH + "temp-dir/csv/" + audioTrackName + ".csv");
             }
             fileNumber++;
@@ -465,7 +467,7 @@ public class DataSetCreator {
     private static String getTrackExpectedOutput(String trackNameGenre){
         String genreValues = "";
         try {
-            Conf.Genre trackGenre = Conf.Genre.valueOf(trackNameGenre.toUpperCase());
+            Genre trackGenre = Genre.valueOf(trackNameGenre.toUpperCase());
             switch (trackGenre){
                 case ROCK:
                     genreValues = "1,0,0,0";

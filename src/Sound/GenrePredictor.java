@@ -4,17 +4,19 @@
 package Sound;
 
 public class GenrePredictor {
-    //TODO move genre enum here
+    public enum Genre {
+        ROCK, DANCE, CLASSICAL, REGGAE, UNKNOWN
+    }
 
     public GenrePredictor(){
 
     }
 
-    public Conf.Genre getTrackGenre(String fileName){
+    public Genre getTrackGenre(String fileName){
         String genreFromName = fileName.substring(fileName.lastIndexOf("-") + 1, fileName.indexOf("."));
-        Conf.Genre fileGenre = Conf.Genre.UNKNOWN;
+        Genre fileGenre = Genre.UNKNOWN;
         try {
-            fileGenre = Conf.Genre.valueOf(genreFromName.toUpperCase());
+            fileGenre = Genre.valueOf(genreFromName.toUpperCase());
         }
         catch(IllegalArgumentException e){
             e.printStackTrace();

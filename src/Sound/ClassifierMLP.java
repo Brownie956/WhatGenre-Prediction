@@ -15,23 +15,25 @@ import org.neuroph.util.TransferFunctionType;
 import java.io.*;
 import java.util.*;
 
+import Sound.GenrePredictor.Genre;
+
 public class ClassifierMLP {
 
     private MultiLayerPerceptron mlp;
     private static int learningFold = 1;
     private int[][] cMatrix;
-    private List<Conf.Genre> cMatrixClasses;
+    private List<Genre> cMatrixClasses;
 
     public ClassifierMLP(){
         this.mlp = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,Conf.NOINPUTS,Conf.NOOFHIDDENNEURONS,Conf.NOOUTPUTS);
-        this.cMatrix = new int[Conf.Genre.values().length][Conf.Genre.values().length];
-        this.cMatrixClasses = new ArrayList<Conf.Genre>();
+        this.cMatrix = new int[Genre.values().length][Genre.values().length];
+        this.cMatrixClasses = new ArrayList<Genre>();
 
-        this.cMatrixClasses.add(Conf.Genre.ROCK);
-        this.cMatrixClasses.add(Conf.Genre.DANCE);
-        this.cMatrixClasses.add(Conf.Genre.CLASSICAL);
-        this.cMatrixClasses.add(Conf.Genre.REGGAE);
-        this.cMatrixClasses.add(Conf.Genre.UNKNOWN);
+        this.cMatrixClasses.add(Genre.ROCK);
+        this.cMatrixClasses.add(Genre.DANCE);
+        this.cMatrixClasses.add(Genre.CLASSICAL);
+        this.cMatrixClasses.add(Genre.REGGAE);
+        this.cMatrixClasses.add(Genre.UNKNOWN);
 
         this.cMatrixClasses = Collections.unmodifiableList(this.cMatrixClasses);
     }
@@ -51,14 +53,14 @@ public class ClassifierMLP {
         }
         else{
             this.mlp = nnet;
-            this.cMatrix = new int[Conf.Genre.values().length][Conf.Genre.values().length];
-            this.cMatrixClasses = new ArrayList<Conf.Genre>();
+            this.cMatrix = new int[Genre.values().length][Genre.values().length];
+            this.cMatrixClasses = new ArrayList<Genre>();
 
-            this.cMatrixClasses.add(Conf.Genre.ROCK);
-            this.cMatrixClasses.add(Conf.Genre.DANCE);
-            this.cMatrixClasses.add(Conf.Genre.CLASSICAL);
-            this.cMatrixClasses.add(Conf.Genre.REGGAE);
-            this.cMatrixClasses.add(Conf.Genre.UNKNOWN);
+            this.cMatrixClasses.add(Genre.ROCK);
+            this.cMatrixClasses.add(Genre.DANCE);
+            this.cMatrixClasses.add(Genre.CLASSICAL);
+            this.cMatrixClasses.add(Genre.REGGAE);
+            this.cMatrixClasses.add(Genre.UNKNOWN);
 
             this.cMatrixClasses = Collections.unmodifiableList(this.cMatrixClasses);
         }
@@ -88,7 +90,7 @@ public class ClassifierMLP {
             PrintWriter writer = new PrintWriter(matrixFile);
             //Predicted classes
             writer.print(",");
-            for(Conf.Genre genre : cMatrixClasses){
+            for(Genre genre : cMatrixClasses){
                 writer.print(genre);
                 if(cMatrixClasses.indexOf(genre) + 1 != cMatrixClasses.size()){
                     writer.print(",");
@@ -150,14 +152,14 @@ public class ClassifierMLP {
             ArrayList<File> testFiles = new ArrayList<File>();
             //Get the training files
             for(String fileName : foldCombo.getKey()){
-                Conf.Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
+                Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
                 File tempTrainFile = new File(Conf.getTROCsvDir(fileGenre) + fileName);
                 trainingFiles.add(tempTrainFile);
             }
 
             //Get the test files
             for(String fileName : foldCombo.getValue()){
-                Conf.Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
+                Genre fileGenre = Conf.getConfig().getGenrePredictor().getTrackGenre(fileName);
                 File tempTestFile = new File(Conf.getTRCsvDir(fileGenre) + fileName);
                 testFiles.add(tempTestFile);
             }
@@ -352,12 +354,12 @@ public class ClassifierMLP {
     public int testNetwork(File[] testFiles){
         int noOfCorrectPredictions = 0;
         for(File track : testFiles){
-            ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+            ArrayList<Genre> predictions = new ArrayList<Genre>();
             String fileName = track.getName();
             String genreFromFileName = fileName.substring(fileName.lastIndexOf("-") + 1, fileName.indexOf("."));
-            Conf.Genre fileGenre = Conf.Genre.UNKNOWN;
+            Genre fileGenre = Genre.UNKNOWN;
             try{
-                fileGenre = Conf.Genre.valueOf(genreFromFileName.toUpperCase());
+                fileGenre = Genre.valueOf(genreFromFileName.toUpperCase());
             }
             catch(IllegalArgumentException e){
                 e.printStackTrace();
@@ -370,14 +372,14 @@ public class ClassifierMLP {
                 double[] rowResult = classifyInstance(row);
 
                 //Print prediction
-                Conf.Genre prediction = makePrediction(rowResult);
+                Genre prediction = makePrediction(rowResult);
                 predictions.add(prediction);
                 System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
                 timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
             }
 
             //Find the majority of predictions
-            Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+            Genre audioTrackPrediction = findGenreMajority(predictions);
             if(audioTrackPrediction.equals(fileGenre)){
                 //Correct
                 noOfCorrectPredictions++;
@@ -409,8 +411,8 @@ public class ClassifierMLP {
         return outputPercentages;
     }
 
-    public Conf.Genre classifyInstance(File audioTrack){
-        ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+    public Genre classifyInstance(File audioTrack){
+        ArrayList<Genre> predictions = new ArrayList<Genre>();
 
         //Extract the values
         Object[] featVals = DataSetCreator.extract(new File[]{audioTrack});
@@ -419,7 +421,7 @@ public class ClassifierMLP {
         //Should only be one track in the returned values
         if(dataSet.size() > 1){
             System.out.println("Error: More than 1 audio track data returned");
-            return Conf.Genre.UNKNOWN;
+            return Genre.UNKNOWN;
         }
 
         ArrayList<ArrayList<Double>> trackDataSet = dataSet.get(0);
@@ -431,20 +433,20 @@ public class ClassifierMLP {
             double[] rowResult = classifyInstance(dataSetRow);
 
             //Print prediction
-            Conf.Genre prediction = makePrediction(rowResult);
+            Genre prediction = makePrediction(rowResult);
             predictions.add(prediction);
             System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
             timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
         }
 
         //Find the majority of predictions
-        Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+        Genre audioTrackPrediction = findGenreMajority(predictions);
         System.out.println("Final Prediction: " + audioTrackPrediction);
         return audioTrackPrediction;
     }
 
-    public Conf.Genre classifyInstance(File audioTrack, Batch batch, String outputPath){
-        ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+    public Genre classifyInstance(File audioTrack, Batch batch, String outputPath){
+        ArrayList<Genre> predictions = new ArrayList<Genre>();
 
         //Extract the values
         Object[] featVals = DataSetCreator.extract(new File[]{audioTrack}, batch, outputPath);
@@ -453,7 +455,7 @@ public class ClassifierMLP {
         //Should only be one track in the returned values
         if(dataSet.size() > 1){
             System.out.println("Error: More than 1 audio track data returned");
-            return Conf.Genre.UNKNOWN;
+            return Genre.UNKNOWN;
         }
 
         ArrayList<ArrayList<Double>> trackDataSet = dataSet.get(0);
@@ -465,49 +467,49 @@ public class ClassifierMLP {
             double[] rowResult = classifyInstance(dataSetRow);
 
             //Print prediction
-            Conf.Genre prediction = makePrediction(rowResult);
+            Genre prediction = makePrediction(rowResult);
             predictions.add(prediction);
             System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
             timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
         }
 
         //Find the majority of predictions
-        Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+        Genre audioTrackPrediction = findGenreMajority(predictions);
         System.out.println(audioTrackPrediction);
         return audioTrackPrediction;
     }
 
-    private Conf.Genre findGenreMajority(ArrayList<Conf.Genre> predictions){
-        HashMap<Conf.Genre, Integer> genreCounts = new HashMap<Conf.Genre, Integer>(Conf.Genre.values().length);
-        genreCounts.put(Conf.Genre.ROCK, 0);
-        genreCounts.put(Conf.Genre.DANCE, 0);
-        genreCounts.put(Conf.Genre.CLASSICAL, 0);
-        genreCounts.put(Conf.Genre.REGGAE, 0);
-        genreCounts.put(Conf.Genre.UNKNOWN, 0);
+    private Genre findGenreMajority(ArrayList<Genre> predictions){
+        HashMap<Genre, Integer> genreCounts = new HashMap<Genre, Integer>(Genre.values().length);
+        genreCounts.put(Genre.ROCK, 0);
+        genreCounts.put(Genre.DANCE, 0);
+        genreCounts.put(Genre.CLASSICAL, 0);
+        genreCounts.put(Genre.REGGAE, 0);
+        genreCounts.put(Genre.UNKNOWN, 0);
 
 
         //Tally up
-        for(Conf.Genre genre : predictions){
-            if(genre == Conf.Genre.ROCK){
-                genreCounts.put(Conf.Genre.ROCK, genreCounts.get(Conf.Genre.ROCK) + 1);
+        for(Genre genre : predictions){
+            if(genre == Genre.ROCK){
+                genreCounts.put(Genre.ROCK, genreCounts.get(Genre.ROCK) + 1);
             }
-            else if(genre == Conf.Genre.DANCE){
-                genreCounts.put(Conf.Genre.DANCE, genreCounts.get(Conf.Genre.DANCE) + 1);
+            else if(genre == Genre.DANCE){
+                genreCounts.put(Genre.DANCE, genreCounts.get(Genre.DANCE) + 1);
             }
-            else if(genre == Conf.Genre.CLASSICAL){
-                genreCounts.put(Conf.Genre.CLASSICAL, genreCounts.get(Conf.Genre.CLASSICAL) + 1);
+            else if(genre == Genre.CLASSICAL){
+                genreCounts.put(Genre.CLASSICAL, genreCounts.get(Genre.CLASSICAL) + 1);
             }
-            else if(genre == Conf.Genre.REGGAE){
-                genreCounts.put(Conf.Genre.REGGAE, genreCounts.get(Conf.Genre.REGGAE) + 1);
+            else if(genre == Genre.REGGAE){
+                genreCounts.put(Genre.REGGAE, genreCounts.get(Genre.REGGAE) + 1);
             }
-            else genreCounts.put(Conf.Genre.UNKNOWN, genreCounts.get(Conf.Genre.UNKNOWN) + 1);
+            else genreCounts.put(Genre.UNKNOWN, genreCounts.get(Genre.UNKNOWN) + 1);
         }
 
         //Is there a genre majority
-        Conf.Genre genrePrediction;
+        Genre genrePrediction;
         Integer largestVal = null;
-        ArrayList<Conf.Genre> largestValues = new ArrayList<Conf.Genre>();
-        for(HashMap.Entry<Conf.Genre, Integer> entry : genreCounts.entrySet()){
+        ArrayList<Genre> largestValues = new ArrayList<Genre>();
+        for(HashMap.Entry<Genre, Integer> entry : genreCounts.entrySet()){
             if(largestVal == null || largestVal < entry.getValue()){
                 largestVal = entry.getValue();
                 largestValues.clear();
@@ -519,7 +521,7 @@ public class ClassifierMLP {
         }
         //Check if there are multiple largest values
         if(largestValues.size() > 1){
-            genrePrediction = Conf.Genre.UNKNOWN;
+            genrePrediction = Genre.UNKNOWN;
         }
         else {
             genrePrediction = largestValues.get(0);
@@ -528,26 +530,26 @@ public class ClassifierMLP {
         return genrePrediction;
     }
 
-    private Conf.Genre makePrediction(double[] results){
-        Conf.Genre predictedGenre = Conf.Genre.UNKNOWN;
+    private Genre makePrediction(double[] results){
+        Genre predictedGenre = Genre.UNKNOWN;
         for(int i = 0; i < results.length; i++){
             if(results[i] > Conf.GENRETHRESHOLD){
                 //Predicted a genre
                 switch (i){
                     case 0:
-                        predictedGenre = Conf.Genre.ROCK;
+                        predictedGenre = Genre.ROCK;
                         break;
                     case 1:
-                        predictedGenre = Conf.Genre.DANCE;
+                        predictedGenre = Genre.DANCE;
                         break;
                     case 2:
-                        predictedGenre = Conf.Genre.CLASSICAL;
+                        predictedGenre = Genre.CLASSICAL;
                         break;
                     case 3:
-                        predictedGenre = Conf.Genre.REGGAE;
+                        predictedGenre = Genre.REGGAE;
                         break;
                     default:
-                        predictedGenre = Conf.Genre.UNKNOWN;
+                        predictedGenre = Genre.UNKNOWN;
                 }
                 break;
             }

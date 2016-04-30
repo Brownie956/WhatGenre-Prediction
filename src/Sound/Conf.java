@@ -3,14 +3,12 @@
 * Description: A class to store configuration settings*/
 package Sound;
 
+import Sound.GenrePredictor.Genre;
+
 public class Conf {
 
     private static Conf sessionInstance = new Conf();
     private GenrePredictor genrePredictor;
-
-    public enum Genre {
-        ROCK, DANCE, CLASSICAL, REGGAE, UNKNOWN
-    }
 
     public static final double GENRETHRESHOLD = 60;
 
