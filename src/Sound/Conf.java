@@ -15,8 +15,6 @@ public class Conf {
     public static final double GENRETHRESHOLD = 60;
 
     public static final String RESOURCESPATH = "res/";
-    public static final String TRAININGDATADIRPATH = RESOURCESPATH + "trainingmusic-cut/";
-    public static final String TRAININGTEMPDIRPATH = RESOURCESPATH + "temp-trainingMusic/";
 
     /*TRAINING MUSIC FILE DIRECTORIES*/
     public static final String TR_MUSIC_BASE_DIR = RESOURCESPATH + "trainingMusic";
@@ -54,29 +52,8 @@ public class Conf {
         return getTECsvDir(genre) + trackName + ".csv";
     }
 
-
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/50/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/100/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/150/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/200/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/250/";
     public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/300/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/350/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/400/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/500/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/700/";
-//    public static final String TRAININGDATAOUTPUTDIRPATH = RESOURCESPATH + "trainingmusic-cut-csv/1000/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-100/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-200/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-300/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-400/";
     public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-500/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-600/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-700/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-800/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-900/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos-1000/";
-//    public static final String TEMPTRAININGCOMBOSPATH = RESOURCESPATH + "temp-trainingCombos/";
 
     public static final String TRAININGDATAPATH = RESOURCESPATH + "trainingData.csv";
     public static final String TRAININGDATATEMPPATH = RESOURCESPATH + "tempTrainingData.csv";
@@ -129,11 +106,7 @@ public class Conf {
 
     public static final String CMATRIXPATH = RESOURCESPATH + "confusion-matrix.csv";
 
-//    public static final int NOINPUTS = 54;
-//    public static final int NOINPUTS = 16;
     public static final int NOINPUTS = 30;
-//    public static final int NOOFHIDDENNEURONS = 16;
-//    public static final int NOOFHIDDENNEURONS = 200;
     public static final int NOOFHIDDENNEURONS = 40;
     public static final int NOOUTPUTS = 4;
     public static final int NOOFFOLDS = 10;
