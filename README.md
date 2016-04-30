@@ -9,6 +9,7 @@ CLASSES:
 * Window - Class to represent an audio window/frame
 
 **INSTALLATION**
+
 1. Import WhatGenre.jar into your project
 
 **USING WHATGENRE**
