@@ -3,6 +3,7 @@
 * Description: Multi Layer Perceptron classifier class. Creates NN, trains and classifies instances*/
 package Sound;
 
+import jAudioFeatureExtractor.ACE.DataTypes.Batch;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
@@ -433,6 +434,7 @@ public class ClassifierMLP {
         ArrayList<ArrayList<Double>> trackDataSet = dataSet.get(0);
 
         //For every row in data set, get output
+        double timeEstimate = Conf.MULTIWINDOWTIME;
         for(ArrayList<Double> row : trackDataSet){
             DataSetRow dataSetRow = new DataSetRow(row);
             double[] rowResult = classifyInstance(dataSetRow);
@@ -440,7 +442,42 @@ public class ClassifierMLP {
             //Print prediction
             Conf.Genre prediction = makePrediction(rowResult);
             predictions.add(prediction);
-            System.out.println("Row prediction: " + prediction);
+            System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
+            timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
+        }
+
+        //Find the majority of predictions
+        Conf.Genre audioTrackPrediction = findGenreMajority(predictions);
+        System.out.println("Final Prediction: " + audioTrackPrediction);
+        return audioTrackPrediction;
+    }
+
+    public Conf.Genre classifyInstance(File audioTrack, Batch batch, String outputPath){
+        ArrayList<Conf.Genre> predictions = new ArrayList<Conf.Genre>();
+
+        //Extract the values
+        Object[] featVals = DataSetCreator.extract(new File[]{audioTrack}, batch, outputPath);
+        ArrayList<ArrayList<ArrayList<Double>>> dataSet = DataSetCreator.processToArrayList(featVals, false);
+
+        //Should only be one track in the returned values
+        if(dataSet.size() > 1){
+            System.out.println("Error: More than 1 audio track data returned");
+            return Conf.Genre.UNKNOWN;
+        }
+
+        ArrayList<ArrayList<Double>> trackDataSet = dataSet.get(0);
+
+        //For every row in data set, get output
+        double timeEstimate = Conf.MULTIWINDOWTIME;
+        for(ArrayList<Double> row : trackDataSet){
+            DataSetRow dataSetRow = new DataSetRow(row);
+            double[] rowResult = classifyInstance(dataSetRow);
+
+            //Print prediction
+            Conf.Genre prediction = makePrediction(rowResult);
+            predictions.add(prediction);
+            System.out.println("Time: " + timeEstimate + ", Prediction: " + prediction);
+            timeEstimate = timeEstimate + Conf.MULTIWINDOWTIME;
         }
 
         //Find the majority of predictions

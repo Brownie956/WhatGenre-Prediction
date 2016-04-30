@@ -305,6 +305,18 @@ public class DataSetCreator {
         return res;
     }
 
+    public static Object[] extract(File[] audioTracks, Batch batch, String outputPath){
+        Object[] res = new Object[0];
+        try{
+            batch.execute();
+            res = (Object[]) XMLDocumentParser.parseXMLDocument(outputPath, "feature_vector_file");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     private static void processOverallToFile(Object[] results, String outputPath){
         try{
             File outputFile = new File(outputPath);
