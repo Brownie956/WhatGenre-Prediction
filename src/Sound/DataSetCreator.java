@@ -53,15 +53,20 @@ public class DataSetCreator {
     public static ArrayList<String> getFileNamesInDir(String directory, boolean includeExt){
         ArrayList<String> fileNames = new ArrayList<String>();
         final File folder = new File(directory);
+        //check directory param is actually a directory
         if(folder.isDirectory()){
             File[] files = folder.listFiles();
             for(File file : files){
-                if(includeExt){
-                    fileNames.add(file.getName());
-                }
-                else {
-                    String fileName = file.getName();
-                    fileNames.add(fileName.substring(0,fileName.indexOf(".")));
+                //add if not a directory
+                if(!file.isDirectory()){
+                    //do we need to remove the extension?
+                    if(includeExt){
+                        fileNames.add(file.getName());
+                    }
+                    else {
+                        String fileName = file.getName();
+                        fileNames.add(fileName.substring(0,fileName.indexOf(".")));
+                    }
                 }
             }
         }
@@ -600,11 +605,14 @@ public class DataSetCreator {
         int resultIndex = 0;
         while(startIndex < track.sub_sets.length) {
             Window[] windowsToAverage;
+            //How many windows are we going to average?
             if (startIndex + Conf.NOOFWINDOWSTOAVERAGE - 1 >= track.sub_sets.length) {
                 windowsToAverage = new Window[track.sub_sets.length - startIndex];
             } else {
                 windowsToAverage = new Window[Conf.NOOFWINDOWSTOAVERAGE];
             }
+
+            //Collect the windows to average
             int winIndex = 0;
             while (winIndex < Conf.NOOFWINDOWSTOAVERAGE && startIndex < track.sub_sets.length) {
                 Window window = new Window(track.sub_sets[startIndex].feature_values);

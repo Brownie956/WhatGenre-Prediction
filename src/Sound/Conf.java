@@ -84,6 +84,7 @@ public class Conf {
 
     public static final String FOLDLOGPATH = RESOURCESPATH + "fold-log-temp.txt";
 
+    /*Settings paths*/
     public static final String FEATURESPATH = RESOURCESPATH + "features.xml";
     public static final String SETTINGSPATH = RESOURCESPATH + "settings.xml";
     public static final String SETTINGSWINPATH = RESOURCESPATH + "settings-win.xml";
@@ -110,7 +111,7 @@ public class Conf {
     public static final int NOOFFOLDS = 10;
 
     public static final int NOOFWINDOWSTOAVERAGE = 300;
-    //Assume 1 window length
+    //Window time based off 44.1 kHz sample rate
     private static final double SINGLEWINDOWTIME = 0.0093;
     public static final double MULTIWINDOWTIME = NOOFWINDOWSTOAVERAGE * SINGLEWINDOWTIME;
 

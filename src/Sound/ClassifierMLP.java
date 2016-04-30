@@ -39,6 +39,7 @@ public class ClassifierMLP {
     }
 
     public ClassifierMLP(MultiLayerPerceptron nnet){
+        //Check for correct number of inputs and outputs
         int numOfInputs = nnet.getInputsCount();
         int numOfOutputs = nnet.getOutputsCount();
         if(numOfOutputs != Conf.NOOUTPUTS){
@@ -71,6 +72,7 @@ public class ClassifierMLP {
     }
 
     private void flushcMatrix(){
+        //Set all values in the matrix to 0
         for(int i = 0; i < cMatrix.length; i++){
             for(int j = 0; j < cMatrix[i].length; j++){
                 cMatrix[i][j] = 0;
@@ -98,8 +100,11 @@ public class ClassifierMLP {
             }
             writer.print("\r\n");
 
+            //Actual class and values
             for(int i = 0; i < cMatrix.length; i++){
+                //Write class
                 writer.print(cMatrixClasses.get(i) + ",");
+                //Write values
                 for(int j = 0; j < cMatrix[i].length; j++){
                     writer.print(cMatrix[i][j]);
                     if(j + 1 != cMatrix[i].length){
