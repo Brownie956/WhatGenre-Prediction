@@ -210,15 +210,6 @@ public class ClassifierMLP {
             logWriter.println("Total correctly predicted: " + totalCorrect);
             logWriter.close();
 
-//            if(totalCorrect < 28){
-//                //TODO remove me - Try again
-//                train(trainTestCombos);
-//            }
-//            else {
-//                mlp.save(Conf.NNOUTPUTPATH);
-//                System.out.println("Done training.");
-//            }
-
             mlp.save(Conf.NNOUTPUTPATH);
             System.out.println("Done training.");
             flushcMatrix();
