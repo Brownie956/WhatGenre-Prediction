@@ -1,5 +1,5 @@
 **WHATGENRE PREDICTOR**
-
+-
 CLASSES:
 * Analysis - Main method class
 * ClassifierMLP - Neural network code (Neuroph)
@@ -12,6 +12,7 @@ CLASSES:
 1. Import WhatGenre.jar into your project
 
 **USING WHATGENRE**
+
 WhatGenre makes use of the following frameworks:
 * jAudio
 https://github.com/dmcennis/jaudioGIT
